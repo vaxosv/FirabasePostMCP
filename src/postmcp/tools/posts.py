@@ -9,24 +9,39 @@ def register_tools(mcp: FastMCP):
     async def create_post_tool(
         title: str,
         content: str,
-        author: str = "AI",
+        description: str,
+        slug: str = "",
+        main_img: str = "",
+        main_img_path: str = "",
+        category_ids: list[str] | None = None,
         tags: list[str] | None = None,
+        views30: int = 0,
         published: bool = False,
     ) -> str:
         """Create a new social news post in Firebase.
 
         Args:
             title: Post title (max 200 characters)
-            content: Post body content
-            author: Author name (defaults to AI)
+            content: Post body content (HTML)
+            description: Short description or blurb (max 500 chars)
+            slug: URL slug (auto-generated from title if empty)
+            main_img: Main image URL
+            main_img_path: Main image storage path
+            category_ids: List of category document IDs
             tags: Optional list of tags
-            published: Whether the post is published immediately
+            views30: Views in last 30 days (default 0)
+            published: Whether the post is published (default false)
         """
         data = PostCreate(
             title=title,
             content=content,
-            author=author,
+            description=description,
+            slug=slug,
+            main_img=main_img,
+            main_img_path=main_img_path,
+            category_ids=category_ids or [],
             tags=tags or [],
+            views30=views30,
             published=published,
         )
         post = create_post(data)
@@ -45,35 +60,34 @@ def register_tools(mcp: FastMCP):
         lines = [
             f"**ID:** {post.id}",
             f"**Title:** {post.title}",
-            f"**Author:** {post.author}",
-            f"**Published:** {post.published}",
+            f"**Description:** {post.description}",
+            f"**Slug:** {post.slug}",
             f"**Tags:** {', '.join(post.tags) if post.tags else 'none'}",
-            f"**Created:** {post.created_at.isoformat()}",
+            f"**Categories:** {', '.join(post.category_ids) if post.category_ids else 'none'}",
+            f"**Views (30d):** {post.views30}",
+            f"**Created:** {post.created_at}",
             f"**Content:**\n{post.content}",
         ]
         return "\n".join(lines)
 
     @mcp.tool()
     async def list_posts_tool(
-        author: str | None = None,
+        category_id: str | None = None,
         tag: str | None = None,
-        published: bool | None = None,
         limit: int = 20,
         offset: int = 0,
     ) -> str:
         """List posts from Firebase with optional filters.
 
         Args:
-            author: Filter by author name
+            category_id: Filter by category document ID
             tag: Filter by tag
-            published: Filter by published status
             limit: Max results (1-100, default 20)
             offset: Pagination offset (default 0)
         """
         filters = PostFilter(
-            author=author,
+            category_id=category_id,
             tag=tag,
-            published=published,
             limit=limit,
             offset=offset,
         )
@@ -82,8 +96,7 @@ def register_tools(mcp: FastMCP):
             return "No posts found matching the given filters."
         lines = [f"Found {len(posts)} posts:"]
         for p in posts:
-            status = "published" if p.published else "draft"
-            lines.append(f"- **{p.id}**: {p.title} (by {p.author}, {status})")
+            lines.append(f"- **{p.id}**: {p.title} ({p.slug})")
         return "\n".join(lines)
 
     @mcp.tool()
@@ -91,8 +104,13 @@ def register_tools(mcp: FastMCP):
         post_id: str,
         title: str | None = None,
         content: str | None = None,
-        author: str | None = None,
+        description: str | None = None,
+        slug: str | None = None,
+        main_img: str | None = None,
+        main_img_path: str | None = None,
+        category_ids: list[str] | None = None,
         tags: list[str] | None = None,
+        views30: int | None = None,
         published: bool | None = None,
     ) -> str:
         """Update an existing post.
@@ -101,16 +119,26 @@ def register_tools(mcp: FastMCP):
             post_id: The Firestore document ID of the post
             title: New title (optional)
             content: New content (optional)
-            author: New author (optional)
+            description: New description (optional)
+            slug: New URL slug (optional)
+            main_img: New main image URL (optional)
+            main_img_path: New image storage path (optional)
+            category_ids: New category IDs list (optional)
             tags: New tags list (optional)
+            views30: New views count (optional)
             published: New published status (optional)
         """
         update = PostUpdate(
             title=title,
             content=content,
-            author=author,
+            description=description,
+            slug=slug,
+            main_img=main_img,
+            main_img_path=main_img_path,
+            category_ids=category_ids,
             tags=tags,
             published=published,
+            views30=views30,
         )
         post = update_post(post_id, update)
         if not post:

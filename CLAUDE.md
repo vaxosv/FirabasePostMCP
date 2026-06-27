@@ -4,7 +4,7 @@
 
 PostMCP is an MCP (Model Context Protocol) server built with Python+FastMCP that
 lets AI agents create, read, update, and delete social news posts stored in
-Firebase Firestore.
+Firebase Firestore (`AiPosts` collection).
 
 ## Architecture
 
@@ -31,6 +31,7 @@ src/postmcp/
 - Business logic lives in `services/`, not in `tools/`
 - Tools in `tools/posts.py` are thin wrappers that call into `services/posts.py`
 - Config comes from environment variables (see `.env.example`)
+- `slug` is auto-generated from `title` if not provided
 
 ## Commands
 

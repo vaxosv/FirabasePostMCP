@@ -13,10 +13,15 @@ Create a new social news post.
 
 Arguments:
 - `title` (string, required) — Post title (max 200 chars)
-- `content` (string, required) — Post body
-- `author` (string, optional, default: "AI") — Author name
+- `content` (string, required) — Post body content (HTML)
+- `description` (string, required) — Short description/blurb (max 500 chars)
+- `slug` (string, optional) — URL slug (auto-generated from title if empty)
+- `main_img` (string, optional) — Main image URL
+- `main_img_path` (string, optional) — Main image storage path
+- `category_ids` (array of strings, optional) — Category document IDs
 - `tags` (array of strings, optional) — List of tags
-- `published` (boolean, optional, default: false) — Publish immediately
+- `views30` (integer, optional, default: 0) — Views in last 30 days
+- `published` (boolean, optional, default: false) — Whether the post is published
 
 ### `get_post_tool`
 Get a single post by its Firestore document ID.
@@ -28,9 +33,8 @@ Arguments:
 List posts with optional filters.
 
 Arguments:
-- `author` (string, optional) — Filter by author
+- `category_id` (string, optional) — Filter by category document ID
 - `tag` (string, optional) — Filter by tag
-- `published` (boolean, optional) — Filter by published status
 - `limit` (integer, optional, default: 20, max: 100) — Max results
 - `offset` (integer, optional, default: 0) — Pagination offset
 
@@ -39,7 +43,7 @@ Update fields on an existing post.
 
 Arguments:
 - `post_id` (string, required) — Document ID
-- `title`, `content`, `author`, `tags`, `published` (all optional)
+- `title`, `content`, `description`, `slug`, `main_img`, `main_img_path`, `category_ids`, `tags`, `views30`, `published` (all optional)
 
 ### `delete_post_tool`
 Delete a post by its ID.
@@ -92,6 +96,6 @@ mcp_servers:
 
 ## Example Workflows
 
-1. **Write and publish a post:** Use `write_news_post` prompt → draft content → call `create_post_tool` with `published=true`
+1. **Generate and save a post:** Use `write_news_post` prompt → draft content → call `create_post_tool` with title, content, description, and optional tags
 2. **Browse recent posts:** Read `postmcp://posts/recent` resource → call `get_post_tool` on interesting ones
-3. **Curate content:** `list_posts_tool(published=false)` → review drafts → `update_post_tool` to publish
+3. **Find posts by category:** `list_posts_tool(category_id="abc123")` → review → `update_post_tool` to edit fields

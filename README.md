@@ -1,20 +1,20 @@
 # PostMCP
 
 An MCP (Model Context Protocol) server for managing AI-generated social news
-posts in Firebase Firestore.
+posts in Firebase Firestore (`AiPosts` collection).
 
 ## Quick Start
 
 ```bash
 # Install dependencies
-uv sync
+python3 -m venv .venv && .venv/bin/pip install -e ".[dev]"
 
 # Configure environment
 cp .env.example .env
 # Edit .env with your Firebase project details
 
 # Run the server
-uv run postmcp
+python -m postmcp
 ```
 
 ## Configuration
@@ -64,13 +64,30 @@ mcp_servers:
 
 ## Tools
 
-- `create_post_tool` — Create a new post
+- `create_post_tool` — Create a new post with title, content, description, slug, images, categories, tags
 - `get_post_tool` — Get a post by ID
-- `list_posts_tool` — List posts with filters
-- `update_post_tool` — Update a post
-- `delete_post_tool` — Delete a post
+- `list_posts_tool` — List posts filtered by category or tag
+- `update_post_tool` — Update any field on a post
+- `delete_post_tool` — Delete a post by ID
 
-See `AGENTS.md` for full documentation for AI agents using this server.
+## Firestore Document Schema
+
+```
+AiPosts/{doc_id}
+├── title: string
+├── content: string (HTML)
+├── description: string
+├── slug: string
+├── main_img: string (URL)
+├── main_img_path: string (storage path)
+├── category_ids: string[]
+├── tags: string[]
+├── views30: number
+├── published: boolean
+└── created_at: string (ISO 8601)
+```
+
+See `AGENTS.md` for full tool documentation for AI agents using this server.
 See `CLAUDE.md` for development conventions.
 
 ## Project Structure
