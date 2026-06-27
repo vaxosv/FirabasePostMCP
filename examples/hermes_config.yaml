@@ -1,0 +1,11 @@
+mcp_servers:
+  postmcp:
+    command: "/ABSOLUTE/PATH/TO/PostMCP/.venv/bin/python"
+    args:
+      - "-m"
+      - "postmcp"
+    env:
+      FIREBASE_CLIENT_EMAIL: "your-service-account@your-project.iam.gserviceaccount.com"
+      FIREBASE_PRIVATE_KEY: "-----BEGIN PRIVATE KEY-----\n...\n-----END PRIVATE KEY-----"
+      FIREBASE_PROJECT_ID: "your-project-id"
+      POSTS_COLLECTION: "AiPosts"
