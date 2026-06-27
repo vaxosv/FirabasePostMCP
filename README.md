@@ -17,6 +17,11 @@ cp .env.example .env
 python -m postmcp
 ```
 
+> **`.env` is optional.** If you only launch PostMCP through an MCP client
+> (Claude Desktop, Hermes Agent), pass the env vars in the client config
+> instead. `.env` is only needed when running `python -m postmcp` directly
+> in the terminal (e.g., for testing).
+
 ## Configuration
 
 | Variable | Description |
